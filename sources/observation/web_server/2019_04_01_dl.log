@@ -1,0 +1,28 @@
+2019-04-01 14:02:22,199 - WARNING - 404 GET / (::1) 1.51ms
+2019-04-01 14:02:22,339 - WARNING - 404 GET /favicon.ico (::1) 2.01ms
+2019-04-01 14:03:16,564 - ERROR - Uncaught exception GET /FindPrimary (::1)
+HTTPServerRequest(protocol='http', host='localhost:9002', method='GET', uri='/FindPrimary', version='HTTP/1.1', remote_ip='::1')
+Traceback (most recent call last):
+  File "C:\Users\pgao5\AppData\Local\Programs\Python\Python37-32\lib\site-packages\tornado\web.py", line 1590, in _execute
+    result = method(*self.path_args, **self.path_kwargs)
+  File ".\web_server9002.py", line 127, in get
+    self.render('find_primary.html')
+  File "C:\Users\pgao5\AppData\Local\Programs\Python\Python37-32\lib\site-packages\tornado\web.py", line 766, in render
+    html = self.render_string(template_name, **kwargs)
+  File "C:\Users\pgao5\AppData\Local\Programs\Python\Python37-32\lib\site-packages\tornado\web.py", line 904, in render_string
+    t = loader.load(template_name)
+  File "C:\Users\pgao5\AppData\Local\Programs\Python\Python37-32\lib\site-packages\tornado\template.py", line 425, in load
+    self.templates[name] = self._create_template(name)
+  File "C:\Users\pgao5\AppData\Local\Programs\Python\Python37-32\lib\site-packages\tornado\template.py", line 452, in _create_template
+    with open(path, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\work\\pworkspace\\hongming\\sources\\observation\\templates\\find_primary.html'
+2019-04-01 14:03:16,642 - ERROR - 500 GET /FindPrimary (::1) 78.74ms
+2019-04-01 14:04:27,586 - INFO - 200 GET /FindPrimary (::1) 6.52ms
+2019-04-01 14:06:25,157 - INFO - 304 GET /FindPrimary (::1) 1.51ms
+2019-04-01 14:07:12,335 - WARNING - 400 POST /FindPrimary (::1): Missing argument original
+2019-04-01 14:07:12,337 - WARNING - 400 POST /FindPrimary (::1) 2.50ms
+2019-04-01 14:11:29,754 - WARNING - 400 POST /FindPrimary (::1): Missing argument original
+2019-04-01 14:11:29,755 - WARNING - 400 POST /FindPrimary (::1) 2.50ms
+2019-04-01 14:11:33,306 - WARNING - 400 POST /FindPrimary (::1): Missing argument original
+2019-04-01 14:11:33,307 - WARNING - 400 POST /FindPrimary (::1) 1.50ms
+2019-04-01 14:12:59,166 - INFO - 200 GET /FindPrimary (::1) 5.01ms
