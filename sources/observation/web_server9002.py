@@ -34,6 +34,7 @@ import numpy as np
 # from ir.config import Config
 import logging
 import time
+import pandas as pd
 
 # from infer_spec import prepare, inference, infer_prob
 
@@ -70,103 +71,75 @@ def chinese_tokenizer(documents):
 # with open('../data/primary_question_dict.json', encoding='utf-8') as primary_dict_f:
 # 	primary_question_dict = json.loads(primary_dict_f.readline())
 
+def temp_file(path_in, path_out):
+	df = pd.read_csv(path_in)
+	df.to_csv(path_out)
+	return df
 
-class FindAnswerHandler(tornado.web.RequestHandler):
-
-	def data_received(self, chunk):
-		pass
-
-	def get(self, *args, **kwargs):
-		self.render('find_answer.html')
-
-	def post(self, *args, **kwargs):
-		self.use_write()
-
-	def use_write(self):
-		question = self.get_argument('question')
-		top_n = int(self.get_argument('top_n'))
-		original = self.get_argument('original')
-		try:
-			# results = search.search4answer(question, top_n=top_n, config=config, original=original)
-			# question_list = [question for _ in range(len(results))]
-			# retrievaled_questions = [temp[1] for temp in results]
-			# probs, _ = infer_prob(question_list, retrievaled_questions, vocab_processor, model, session)
-			# positive_probs = probs[:, 1]
-			# alternative_answers = [temp[2] for temp in results]
-
-			# json_data = {
-			# 	'question': str(question),
-			# 	'retrieval_question': '|||'.join(retrievaled_questions),
-			# 	'probabilities': '|||'.join(str(prob) for prob in positive_probs),
-			# 	'answer': str(alternative_answers)
-			# }
-			json_data = {
-			    'question': 'question',
-			    'retrieval_question': 'retrieval_question',
-			    'probabilities': '|||',
-			    'answer': 'answer'
-			}
-			# print(json_data)
-			self.write(json.dumps(json_data, ensure_ascii=False))
-		except Exception as e:
-			print(e)
-			json_data = {
-				'question': str(question),
-				'retrieval_question': 'unknown',
-				'probabilities': 'unknown',
-				'answer': 'unknown'
-			}
-			self.write(json.dumps(json_data, ensure_ascii=False))
-
+def temp_str(str_in):
+	str0=str_in
+	str1=str_in
+	str2=str_in
+	str3=str_in
+	str4=str_in
+	str5=str_in
+	str6=str_in
+	str7=str_in
+	str8=str_in
+	str9=str_in
+	return str0,str1,str2,str3,str4,str5,str6,str7,str8,str9
 
 class PrimaryQuestionFindHandler(tornado.web.RequestHandler):
-	def data_received(self, chunk):
-		pass
 
 	def get(self, *args, **kwargs):
-		self.render('find_primary.html')
+		params = {
+			"module_name": 'find_primary.html',
+			"type": self.get_query_argument('type', 'single')
+		}
+		self.render('frame.html', params=params)
 
 	def post(self, *args, **kwargs):
-		self.use_write()
+		self.post_request()
 
-	def use_write(self):
-		question = self.get_argument('question')
-		topn = int(self.get_argument('top_n'))
-		original = self.get_argument('original')
+	def download(self, *args, **kwargs):
+		filename = self.get_query_argument('filename', '')
+		if len(filename) < 1:
+			self.set_status(404)
+			self.finish("File not found");
+		else:
+			buf_size = 4096
+			self.set_header('Content-Type', 'application/octet-stream')
+			self.set_header('Content-Disposition', 'attachment; filename')
+			with open('data/' + filename, 'r') as f:
+				while True:
+					data = f.read(bug_size)
+					if not data:
+						break
+					self.write(data)
+			self.finish()
 
-		try:
-			# results = search.search_by_question(question, top_n=topn, config=config, original=original)
-			# question_list = [question for _ in range(len(results))]
-			# retrievaled_questions = [temp[1] for temp in results]
-			# probs, _ = infer_prob(question_list, retrievaled_questions, vocab_processor, model, session)
-			# positive_probs = probs[:, 1]
+	def post_request(self):
+		type = self.get_argument('type')
+		params = {
+			'type': type,
+			'module_name': 'find_primary.html'
+		}
+		if type == 'single':
+			diagnose_text = self.get_argument('diagnose_text')
+			params['diagnose_text'] = diagnose_text
 
-			# alternative_primary_questions = []
-			# for result in results:
-			# 	alternative_primary_questions.append(result[2])
-			# 	json_data = {
-			# 		'alternative': '|||'.join(alternative_primary_questions),
-			# 		'sub_question': '|||'.join(retrievaled_questions),
-			# 		'match_score': '|||'.join([str(prob) for prob in positive_probs]),
-			# 		'user_query': str(question)
-			# 	}
-			# print(json_data)
-			json_data = {
-				'question': question,
-				'topn': topn,
-				'original': original
-			}
-			self.write(json.dumps(json_data, ensure_ascii=False))
-
-		except Exception as e:
-			print(e)
-			json_data = {
-				'alternative': 'Unknown',
-				'match_score': '0',
-				'user_query': str(question)
-			}
-			self.write(json.dumps(json_data, ensure_ascii=False))
-
+			params['diagnose_result'] = temp_str(str_in=diagnose_text)
+			self.render('frame.html', params=params)
+		elif type == 'batch':
+			file = self.request.files['file'][0]
+			original_fname = file['filename']
+			extension = os.path.splitext(original_fname)[1]
+			output_file = open('uploads/' + original_fname, 'wb')
+			output_file.write(file['body'])
+			if extension == 'csv':
+				temp_file(path_in='uploads/' + original_fname, path_out='data/' + original_fname)
+				params['downloadUrl'] = '/download?filename=' + original_fname;
+			self.render('frame.html', params=params)
 
 def make_app():
 	setting = dict(
@@ -174,7 +147,7 @@ def make_app():
 		static_path=os.path.join(os.path.dirname(__file__), 'static')
 	)
 	return tornado.web.Application(
-		[(r'/FindAnswer', FindAnswerHandler), (r'/FindPrimary', PrimaryQuestionFindHandler)],
+		[(r'/FindPrimary', PrimaryQuestionFindHandler)],
 		**setting
 	)
 

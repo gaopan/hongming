@@ -1,65 +1,47 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title></title>
-</head>
-<style>
-	body {
-		min-height: 100vh;
-		font-size: 14px;
-		font-family: arial;
-	}
-  .form {
-  	display: flex;
-  	align-items: center;
-  	justify-content: center;
-  }
-  form {
-  	padding: 20px 30px;
-  	border: 1px solid rgb(112, 173, 71);
-  	border-radius: 15px;
-  }
-  form>h3 {
-  	margin-bottom: 15px;
-  }
-  form>div.form-group {
-  	margin-bottom: 15px;
-  }
-  form>.form-actions {
-  	margin-top: 20px;
-  }
-  form input[type=submit] {
-  	display: inline-block;
-  	height: 34px;
-  	padding: 5px 10px;
-  	background-color: rgb(112, 173, 71);
-  	color: #fff;
-  	border: 1px solid rgb(112, 173, 70);
-  }
-  form input[type=submit]:hover {
-  	background-color: rgb(112, 173, 71);
-  	color: #fff;
-  	border-color: rgb(112, 173, 70);
-  }
-</style>
-
-<body>
-  <div class="form">
-    <form action="FindPrimary" enctype="multipart/form-data" method="post">
-      <h3>医源智汇信息科技（广州）有限公司</h3>
-      <div class="form-group">
-        <label>选择待转换的文件存储路径：</label>
-        <input type="text" name="pathToConvert" />
-      </div>
-      <div class="form-group">
-        <label>选择转换后的文件存储路径：</label>
-        <input type="text" name="pathAfterConvert" />
-      </div>
-      <div class="form-actions"><input type="submit" value="submit"></div>
-    </form>
-  </div>
-</body>
-
-</html>
+<div class="form">
+  {% if params['type'] == 'batch' %}
+  <form id="batchFind" action="FindPrimary" enctype="multipart/form-data" method="post">
+  	<div class="archor">
+  	  <a href="/FindPrimary?type=single">处理单条</a>
+    </div>
+    <h3>医源智汇信息科技（广州）有限公司</h3>
+    <div class="form-group">
+      <label>选择待转换的文件：</label>
+      <input type="file" name="file" />
+    </div>
+    <input type="hidden" name="type" value="batch" />
+    {% if 'downloadUrl' in params %}
+    <div class="form-group">
+      <label>转换后文件：</label>
+      <a href="params['downloadUrl']">点击下载</a>
+    </div>
+    {% end %}
+    <div class="form-actions"><input type="submit" value="提交"></div>
+  </form>
+  {% elif params['type'] == 'single' %}
+  <form id="singleFind" action="FindPrimary" enctype="multipart/form-data" method="post">
+  	<div class="archor">
+  	  <a href="/FindPrimary?type=batch">处理批量</a>
+    </div>
+    <h3>医源智汇信息科技（广州）有限公司</h3>
+    <div class="form-group">
+      <label>请输入诊断文字：</label>
+      {% if 'diagnose_text' in params %}
+      <input type="text" name="diagnose_text" value="{{ params['diagnose_text'] }}" placeholder="" />
+      {% else %}
+      <input type="text" name="diagnose_text" placeholder="" />
+      {% end %}
+    </div>
+    <input type="hidden" name="type" value="single" />
+    {% if 'diagnose_result' in params %}
+    <div class="form-group">
+      <label>校正ICD结果：</label>
+      <p>{{ params['diagnose_result'] }}</p>
+    </div>
+    {% end %}
+    {% if 'diagnose_result' not in params %}
+    <div class="form-actions"><input type="submit" value="下一步"></div>
+    {% end %}
+  </form>
+  {% end %}
+</div>
